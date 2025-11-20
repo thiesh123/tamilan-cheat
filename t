@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TAMILAN STORE</title>
+<style>
+/* ---- CSS (floating cards + particles + parallax + animations) ---- */
+body{margin:0;font-family:system-ui,Arial;color:#fff;overflow-x:hidden;position:relative;background:#070707;}
+header{padding:16px;background:linear-gradient(90deg,#0d0d0d,#111);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:1000}
+header .logo{display:flex;gap:12px;align-items:center;animation:pulse 3s infinite;}
+header .logo .mark{width:40px;height:40px;border-radius:8px;background:linear-gradient(135deg,#c99b34,#8b6e2b);display:flex;align-items:center;justify-content:center;font-weight:700;color:#071;}
+header .logo .title{font-weight:700;font-size:18px}
+header input{padding:8px 12px;border-radius:999px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:#fff;outline:none;width:180px;transition:all .3s}
+header input:focus{border:1px solid #c99b34;box-shadow:0 0 15px #c99b34}
+.container{max-width:1000px;margin:16px auto;padding:8px;position:relative;z-index:2}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px}
+.card{background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));padding:12px;border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,0.5);cursor:pointer;transition:all .3s transform .2s, box-shadow .3s;}
+.card:hover{transform:translateY(-15px) scale(1.07);box-shadow:0 18px 30px rgba(0,0,0,0.8);}
+.card img{width:100%;height:120px;object-fit:cover;border-radius:8px;transition:transform .4s;}
+.card img:hover{transform:scale(1.08);}
+h1,h2,h3{margin:6px 0;transition:transform .4s;}
+.btn{display:inline-block;padding:10px 14px;border-radius:8px;background:#c99b34;color:#071;text-decoration:none;font-weight:700;margin-top:8px;transition:all .3s;box-shadow:0 0 5px rgba(201,155,52,0.6);}
+.btn:hover{background:#e0b741;color:#000;transform:scale(1.08);box-shadow:0 0 15px rgba(201,155,52,0.9);}
+.section{display:none;opacity:0;transform:translateY(20px);transition:opacity .5s, transform .5s;}
+.section.active{display:block;opacity:1;transform:translateY(0);}
+.back-btn{color:#c99b34;text-decoration:none;font-weight:700;display:inline-block;margin-bottom:12px;transition:all .3s}
+.back-btn:hover{color:#e0b741}
+.payment-card{background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));padding:16px;border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,0.5);transition:all .3s}
+.whatsapp{display:inline-block;margin-top:12px;padding:10px 14px;border-radius:8px;background:#25D366;color:#002;text-decoration:none;font-weight:800;transition:all .3s;}
+.whatsapp:hover{background:#128C7E;color:#fff;transform:scale(1.05);box-shadow:0 0 10px #25D366;}
+.note{margin-top:12px;color:#cfcfcf;font-size:13px}
+@media (max-width:600px){#productDetails div{grid-template-columns:1fr !important}}
+@keyframes pulse {0%{transform:scale(1);}50%{transform:scale(1.05);}100%{transform:scale(1);}}
+#bgCanvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;}
+</style>
+</head>
+<body>
+
+<canvas id="bgCanvas"></canvas>
+
+<header>
+  <div class="logo"><div class="mark">T</div><div class="title">TAMILAN STORE</div></div>
+  <input id="search" placeholder="Search softwares...">
+</header>
+
+<div class="container">
+  <div id="home" class="section active"><div class="grid" id="productsGrid"></div></div>
+  <div id="product" class="section">
+    <a href="#" class="back-btn" onclick="showSection('home')">← Back to Store</a>
+    <div id="productDetails"></div>
+  </div>
+  <div id="payment" class="section">
+    <a href="#" class="back-btn" onclick="showSection('home')">← Back to Store</a>
+    <div class="payment-card">
+      <h2>Bank Payment Details</h2>
+      <p><b>Bank Name:</b> l.thinesh</p>
+      <p><b>Account Holder Name:</b> thinesh</p>
+      <p><b>Account Number:</b> 86241500</p>
+      <p><b>Branch:</b> BOC</p>
+      <a id="whatsappLink" href="https://wa.me/94768799775" class="whatsapp" target="_blank">Pay & Send Proof (WhatsApp)</a>
+      <p class="note">Use above bank details to pay. After payment, send screenshot/transaction ID on WhatsApp to receive the download link.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+// Product Data
+const PRODUCTS=[{id:1,name:"Software 1",price:250,desc:"Premium Version – Fully Unlocked",img:"images/photo1.jpg"},{id:2,name:"Software 2",price:300,desc:"Secure & Fast Tool",img:"images/photo2.jpg"},{id:3,name:"Software 3",price:200,desc:"Latest Updated Version",img:"images/photo3.jpg"},{id:4,name:"Software 4",price:400,desc:"Android / PC Support",img:"images/photo4.jpg"},{id:5,name:"Software 5",price:150,desc:"Premium Tool",img:"images/photo5.jpg"},{id:6,name:"Software 6",price:350,desc:"VIP Version",img:"images/photo6.jpg"},{id:7,name:"Software 7",price:180,desc:"Safe & Clean",img:"images/photo7.jpg"},{id:8,name:"Software 8",price:220,desc:"Highly Recommended",img:"images/photo8.jpg"},{id:9,name:"Software 9",price:275,desc:"Best Performance",img:"images/photo9.jpg"},{id:10,name:"Software 10",price:500,desc:"Top Selling Tool",img:"images/photo10.jpg"}];
+
+// Render Products
+const grid=document.getElementById('productsGrid');
+function renderProducts(list){
+  grid.innerHTML=list.map((p,i)=>`
+  <div class="card" data-index="${i}" onclick="viewProduct(${p.id})">
+    <img src="${p.img}" alt="${p.name}">
+    <h3>${p.name}</h3>
+    <div style="font-size:13px;color:#cfcfcf">${p.desc}</div>
+    <div class="btn">Rs. ${p.price} — Buy Now</div>
+  </div>`).join('');
+}
+renderProducts(PRODUCTS);
+
+// Search
+document.getElementById('search').addEventListener('input',(e)=>{
+  const q=e.target.value.trim().toLowerCase();
+  const filtered=PRODUCTS.filter(p=>p.name.toLowerCase().includes(q)||p.desc.toLowerCase().includes(q));
+  renderProducts(filtered);
+});
+
+// Sections
+function showSection(id){document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
+
+// View Product
+function viewProduct(id){const p=PRODUCTS.find(x=>x.id===id);document.getElementById('productDetails').innerHTML=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;"><img src="${p.img}" style="width:100%;height:320px;object-fit:cover;border-radius:10px;"><div style="padding:12px;background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));border-radius:12px;"><h2>${p.name}</h2><p style="color:#cfcfcf">${p.desc}</p><p style="font-weight:700;color:#c99b34;font-size:20px">Rs. ${p.price}</p><a href="#" class="btn" onclick="showPayment(${p.id})">Proceed to Payment</a></div></div>`;showSection('product');}
+
+// Payment Section
+function showPayment(id){document.getElementById('whatsappLink').href=`https://wa.me/94768799775?text=I paid for ${PRODUCTS.find(p=>p.id===id).name}`;showSection('payment');}
+
+// Background + Particles + Parallax
+const canvas=document.getElementById('bgCanvas');const ctx=canvas.getContext('2d');canvas.width=window.innerWidth; canvas.height=window.innerHeight;let gradientOffset=0;let particles=[];let mouse={x:canvas.width/2,y:canvas.height/2};
+function initParticles(){particles=[];for(let i=0;i<70;i++){particles.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:Math.random()*3+1,s:Math.random()*0.3+0.2});}}
+initParticles();
+window.addEventListener('mousemove',e=>{mouse.x=e.clientX;mouse.y=e.clientY;});window.addEventListener('resize',()=>{canvas.width=window.innerWidth;canvas.height=window.innerHeight;initParticles();});
+function drawBackground(){gradientOffset+=0.0015;const gradient=ctx.createLinearGradient(0,0,canvas.width,canvas.height);gradient.addColorStop(0, `hsl(${gradientOffset*360},50%,5%)`);gradient.addColorStop(1, `hsl(${(gradientOffset*360+60)%360},50%,10%)`);ctx.fillStyle=gradient;ctx.fillRect(0,0,canvas.width,canvas.height);}
+function drawParticles(){ctx.fillStyle='rgba(255,255,255,0.5)';particles.forEach(p=>{ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();p.x += (mouse.x-canvas.width/2)*0.0005;p.y -= p.s;if(p.y<0) p.y=canvas.height;if(p.x>canvas.width)p.x=0;if(p.x<0)p.x=canvas.width;});}
+function animate(){drawBackground();drawParticles();document.querySelectorAll('.card').forEach((card,i)=>{const offset=Math.sin(Date.now()/1000 + i)*5;card.style.transform=`translateY(${offset}px)`;});document.querySelectorAll('h2,h3').forEach((el,i)=>{const scrollY=window.scrollY;el.style.transform=`translateY(${scrollY*0.03}px)`;});requestAnimationFrame(animate);}
+animate();
+</script>
+</body>
+</html>
